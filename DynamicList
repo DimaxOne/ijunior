@@ -1,0 +1,95 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DynamicList
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            List<int> numbers = new List<int>();
+            bool isExit = false;
+            bool correctNumber = false;
+            int userNumber = 0;
+            int sum = 0;
+
+            while (isExit != true)
+            {
+                Console.WriteLine("Доступны следующие действия:\n1.Добавить число\n2.Вывести сумму всех чисел" +
+                    "\n3.Вывести весь список чисел\n4.Выход из программы");
+
+                Console.WriteLine("Введите вашу команду: ");
+                while (correctNumber != true)
+                {
+                    correctNumber = CheckNumberMain(ref userNumber);
+                }
+                correctNumber = false;
+                
+                switch (userNumber)
+
+                {
+                    case 1:
+                        Console.WriteLine("Введите ваше число: ");
+                        while (correctNumber != true)
+                        {
+                            correctNumber = AddNumber(ref numbers, ref userNumber);
+                        }
+                        correctNumber = false;
+                        break;
+                    case 2:
+                        foreach (var number in numbers)
+                        {
+                            sum += number;
+                        }
+                        Console.WriteLine($"Сумма всех чисел равна: {sum}.");
+                        sum = 0;
+                        Console.ReadKey();
+                        break;
+                    case 3:
+                        Console.WriteLine("Все числа в списке:");
+                        foreach (var number in numbers)
+                        {
+                            Console.WriteLine(number);
+                        }
+                        Console.ReadKey();
+                        break;
+                    case 4:
+                        isExit = true;
+                        break;
+                }
+
+                Console.Clear();
+            }
+        }
+
+        static bool CheckNumberMain(ref int userNumber)
+        {
+            bool result = int.TryParse(Console.ReadLine(), out userNumber);
+            if (result && userNumber > 0 && userNumber <= 4) {}
+            else
+            {
+                Console.WriteLine("Введите корректную команду: ");
+            }
+
+            return result;
+        }
+
+        static bool AddNumber(ref List<int> numbers, ref int userNumber)
+        {
+            bool result = int.TryParse(Console.ReadLine(), out userNumber);
+            if (result)
+            {
+                numbers.Add(userNumber);
+            }
+            else
+            {
+                Console.WriteLine("Введите корректное число: ");
+            }
+
+            return result;
+        }
+    }
+}
