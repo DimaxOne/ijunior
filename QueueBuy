@@ -19,8 +19,8 @@ namespace QueueBuy
 
             for(int i = customers.Count; i > 0; i--)
             {
-                CustomerBuy(customers, ref money);
-
+                money += ServeBuyer(customers);
+                Console.WriteLine($"Общая сумма денег на счете: {money}");
                 Console.ReadKey();
                 Console.Clear();
             }
@@ -39,12 +39,10 @@ namespace QueueBuy
             return customer;
         }
 
-        static void CustomerBuy(Queue<int> customer, ref int money)
+        static int ServeBuyer(Queue<int> customer)
         {
             Console.WriteLine($"Сумма покупки клиена: {customer.Peek()}");
-            money += customer.Dequeue();
-            Console.WriteLine($"Общая сумма денег на счете: {money}");
-
+            return customer.Dequeue();
         }
     }
 }
