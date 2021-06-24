@@ -58,16 +58,31 @@ namespace CollectionDossier
             string name = Console.ReadLine();
             Console.Write("Введите должность добавляемого сотрудника: ");
             string function = Console.ReadLine();
-            personnesDossier.Add(name, function);
+            bool checkKey = false;
+            foreach (var personnes in personnesDossier)
+            {
+                if (personnes.Key == name)
+                checkKey = true;
+            }
+            
+            if (checkKey)
+            {
+                Console.WriteLine("Такой сотрудник уже имеется.");
+            }
+            else
+            {
+                personnesDossier.Add(name, function);
+                Console.WriteLine("Сотрудник успешно добавлен.");
+            }
         }
 
         static void ShowAllDossier(Dictionary<string, string> personnesDossier)
         {
             Console.WriteLine("Весь список сотрудников: ");
 
-            foreach (var pers in personnesDossier)
+            foreach (var personnes in personnesDossier)
             {
-                Console.WriteLine($"{pers.Key} - {pers.Value}");
+                Console.WriteLine($"{personnes.Key} - {personnes.Value}");
             }
         }
 
@@ -75,23 +90,15 @@ namespace CollectionDossier
         {
             Console.WriteLine("Введите ФИО сотрудника для удаления: ");
             string checkUserInput = Console.ReadLine();
-            {
-                bool checkDelete = false;
-                foreach (var pers in personnesDossier)
-                {
-                    bool result = personnesDossier.Remove(checkUserInput);
-                    if (result)
-                    {
-                        Console.WriteLine("Сотрудник успешно удален.");
-                        checkDelete = true;
-                        break;
-                    }
-                }
 
-                if (!checkDelete)
-                {
-                    Console.WriteLine("Данного сотрудника нет в списке");
-                }
+            bool result = personnesDossier.Remove(checkUserInput);
+            if (result)
+            {
+                Console.WriteLine("Сотрудник успешно удален.");
+            }
+            else
+            {
+                Console.WriteLine("Данного сотрудника нет в списке.");
             }
         }
     }
