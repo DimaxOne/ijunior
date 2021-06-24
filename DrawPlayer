@@ -1,0 +1,42 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DrawPlayer
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Player playerOne = new Player(8, 7);
+            Draw draw = new Draw();
+            
+            draw.Player(playerOne.X, playerOne.Y);
+        }
+    }
+
+    class Player
+    {
+        
+        public int X { get; private set; }
+
+        public int Y { get; private set; }
+
+        public Player(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
+    }
+
+    class Draw
+    { 
+        public void Player(int x, int y, char symbol = '*')
+        {
+            Console.SetCursorPosition(x, y);
+            Console.WriteLine(symbol);
+        }
+    }
+}
