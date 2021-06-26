@@ -1,0 +1,172 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace PlayerData
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Database data = new Database();
+            data.AddPlayer("Nick", 1, false);
+            data.AddPlayer("John", 1, false);
+            data.AddPlayer("Mark", 3, true);
+
+            while (true)
+            {
+                Console.WriteLine("Возможные команды для работы с базой данных:\n1. Добавить игрока;\n2. Бан игрока по порядковому номеру" +
+                    "\n3. Разбан игрока по порядковому номеру;\n4. Удаление игрока\n5. Показать всех игроков" +
+                    "\n Что вы хотите сделать?");
+                string userInput = Console.ReadLine();
+
+                switch (userInput)
+                {
+                    case "1":
+                        Console.Write("Введите имя нового игрока: ");
+                        data.AddPlayer(Console.ReadLine());
+                        break;
+                    case "2":
+                        Console.Write("Введите id игрока для бана:");
+                        int id = Convert.ToInt32(Console.ReadLine());
+                        bool result = data.GetBan(id);
+                        if (result)
+                        {
+                            Console.WriteLine("Игрок уже забанен.");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Игрок с порядковым номером - {id} забанен.");
+                        } 
+                        break;
+                    case "3":
+                        Console.Write("Введите id игрока для разбана:");
+                        int idUnlock = Convert.ToInt32(Console.ReadLine());
+                        bool resultUnlock = data.GetUnlock(idUnlock);
+                        if (resultUnlock)
+                        {
+                            Console.WriteLine($"Игрок с порядковым номером - {idUnlock} разбанен."); 
+                        }
+                        else
+                        {
+                            Console.WriteLine("Игрок не забанен.");
+                        }
+                        break;
+                    case "4":
+                        Console.Write("Введите id игрока для удаления: ");
+                        int idDelete = Convert.ToInt32(Console.ReadLine());
+                        data.DeletePlayer(idDelete);
+                        break;
+                    case "5":
+                        data.ShowAllPlayers();
+                        break;
+                    default:
+                        break;
+                }
+            }  
+        }
+    }
+
+    class Database
+    {
+        private List<Player> _players;
+
+        public Database()
+        {
+            _players = new List<Player>();
+        }
+
+        public void AddPlayer(string nickName, int level = 0, bool isBan = false)
+        {
+            _players.Add(new Player(nickName, level, isBan));
+        }
+
+        public void DeletePlayer(int id)
+        {
+            bool checkId = id > 0 && id < _players.Count;
+            
+            if(checkId)
+            {
+                _players.RemoveAt(id);
+                Console.WriteLine("Игрок удален.");
+            }
+            else
+            {
+                Console.WriteLine("Такого игрока нет.");
+            }
+        }
+
+        public bool GetBan(int id)
+        {
+            if (_players[id].IsBan == false)
+            {
+                _players[id].GetBan();
+                return false;
+            }
+            else
+                return true;
+        }
+
+        public bool GetUnlock(int id)
+        {
+            if (_players[id].IsBan == true)
+            {
+                _players[id].GetUnlock();
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public void ShowAllPlayers()
+        {
+            for (int i = 0; i < _players.Count; i++)
+            {
+                Console.WriteLine($"{i}. Ник - {_players[i].NickName}, уровень - {_players[i].Level}, статус бана - " +
+                    $"{_players[i].IsBan}");
+            }
+        }
+    }
+
+    class Player
+    {
+        private string _nickName;
+        private int _level;
+        private bool _isBan;
+
+        public string NickName
+        {
+            get { return _nickName; }
+            private set { _nickName = value; }
+        }
+        public int Level
+        {
+            get { return _level; }
+            private set { _level = value; }
+        }
+        public bool IsBan
+        {
+            get { return _isBan; }
+            private set { _isBan = value; }
+        }
+
+        public Player(string nickName, int level, bool isBan)
+        {
+            _nickName = nickName;
+            _level = level;
+            _isBan = isBan;
+        }
+
+        public void GetBan()
+        {
+            _isBan = true;
+        }
+
+        public void GetUnlock()
+        {
+            _isBan = false;
+        }
+    }
+}
