@@ -22,6 +22,7 @@ namespace PlayerData
     class Database
     {
         private List<Player> _players = new List<Player>();
+        private bool _isExit = false;
 
         public Database()
         {
@@ -33,11 +34,79 @@ namespace PlayerData
             _players.Add(new Player(nickName, level, isBan));
         }
 
-        public void DeletePlayer(int id)
+        public void Work()
+        {
+            while (!_isExit)
+            {
+                Console.WriteLine("Возможные команды для работы с базой данных:\n1. Добавить игрока;\n2. Бан игрока по порядковому номеру" +
+                    "\n3. Разбан игрока по порядковому номеру;\n4. Удаление игрока\n5. Показать всех игроков\n6. Выход" +
+                    "\n Что вы хотите сделать?");
+                int userInput = CheckNumber();
+
+                switch (userInput)
+                {
+                    case 1:
+                        Console.Write("Введите имя нового игрока: ");
+                        AddPlayer(Console.ReadLine());
+                        break;
+                    case 2:
+                        Console.Write("Введите id игрока для бана:");
+                        int id = CheckNumber();
+                        if (id < 0 || id > _players.Count)
+                        {
+                            Console.WriteLine("Такого игрока не существует.");
+                        }
+                        else
+                        {
+                            BanPlayer(id);
+                        }
+                        break;
+                    case 3:
+                        Console.Write("Введите id игрока для разбана:");
+                        int idUnlock = CheckNumber();
+                        if (idUnlock < 0 || idUnlock > _players.Count)
+                        {
+                            Console.WriteLine("Такого игрока не существует.");
+                        }
+                        else
+                        {
+                            UnbanPlayer(idUnlock);
+                        }
+                        break;
+                    case 4:
+                        Console.Write("Введите id игрока для удаления: ");
+                        int idDelete = CheckNumber();
+                        DeletePlayer(idDelete);
+                        break;
+                    case 5:
+                        ShowAllPlayers();
+                        break;
+                    case 6:
+                        _isExit = true;
+                        break;
+                    default:
+                        Console.WriteLine("Введите корректную команду.");
+                        break;
+                }
+            }
+        }
+
+        private int CheckNumber()
+        {
+            int number;
+            while (!int.TryParse(Console.ReadLine(), out number))
+            {
+                Console.WriteLine("Введите корректное число.");
+            }
+
+            return number;
+        }
+
+        private void DeletePlayer(int id)
         {
             bool checkId = id >= 0 && id < _players.Count;
-            
-            if(checkId)
+
+            if (checkId)
             {
                 _players.RemoveAt(id);
                 Console.WriteLine("Игрок удален.");
@@ -48,29 +117,33 @@ namespace PlayerData
             }
         }
 
-        public bool GiveBanPlayer(int id)
-        {
-            if (_players[id].IsBan == false)
-            {
-                _players[id].GetBan();
-                return false;
-            }
-            else
-                return true;
-        }
-
-        public bool GiveUnlockPlayer(int id)
+        private void UnbanPlayer(int id)
         {
             if (_players[id].IsBan == true)
             {
-                _players[id].GetUnlock();
-                return true;
+                _players[id].Unban();
+                Console.WriteLine($"Игрок с порядковым номером - {id} разбанен.");
             }
             else
-                return false;
+            {
+                Console.WriteLine("Игрок не забанен.");
+            }
         }
 
-        public void ShowAllPlayers()
+        private void BanPlayer(int id)
+        {
+            if (_players[id].IsBan == false)
+            {
+                _players[id].Ban();
+                Console.WriteLine($"Игрок с порядковым номером - {id} забанен.");
+            }
+            else
+            {
+                Console.WriteLine("Игрок уже забанен.");
+            }
+        }
+
+        private void ShowAllPlayers()
         {
             for (int i = 0; i < _players.Count; i++)
             {
@@ -78,100 +151,29 @@ namespace PlayerData
                     $"{_players[i].IsBan}");
             }
         }
-
-        public void Work()
-        {
-            while (true)
-            {
-                Console.WriteLine("Возможные команды для работы с базой данных:\n1. Добавить игрока;\n2. Бан игрока по порядковому номеру" +
-                    "\n3. Разбан игрока по порядковому номеру;\n4. Удаление игрока\n5. Показать всех игроков" +
-                    "\n Что вы хотите сделать?");
-                string userInput = Console.ReadLine();
-
-                switch (userInput)
-                {
-                    case "1":
-                        Console.Write("Введите имя нового игрока: ");
-                        AddPlayer(Console.ReadLine());
-                        break;
-                    case "2":
-                        Console.Write("Введите id игрока для бана:");
-                        int id = Convert.ToInt32(Console.ReadLine());
-                        bool result = GiveBanPlayer(id);
-                        if (result)
-                        {
-                            Console.WriteLine("Игрок уже забанен.");
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Игрок с порядковым номером - {id} забанен.");
-                        }
-                        break;
-                    case "3":
-                        Console.Write("Введите id игрока для разбана:");
-                        int idUnlock = Convert.ToInt32(Console.ReadLine());
-                        bool resultUnlock = GiveUnlockPlayer(idUnlock);
-                        if (resultUnlock)
-                        {
-                            Console.WriteLine($"Игрок с порядковым номером - {idUnlock} разбанен.");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Игрок не забанен.");
-                        }
-                        break;
-                    case "4":
-                        Console.Write("Введите id игрока для удаления: ");
-                        int idDelete = Convert.ToInt32(Console.ReadLine());
-                        DeletePlayer(idDelete);
-                        break;
-                    case "5":
-                        ShowAllPlayers();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
     }
 
     class Player
     {
-        private string _nickName;
-        private int _level;
-        private bool _isBan;
-
-        public string NickName
-        {
-            get { return _nickName; }
-            private set { _nickName = value; }
-        }
-        public int Level
-        {
-            get { return _level; }
-            private set { _level = value; }
-        }
-        public bool IsBan
-        {
-            get { return _isBan; }
-            private set { _isBan = value; }
-        }
+        public string NickName { get; private set; }
+        public int Level { get; private set; }
+        public bool IsBan { get; private set; }
 
         public Player(string nickName, int level, bool isBan)
         {
-            _nickName = nickName;
-            _level = level;
-            _isBan = isBan;
+            NickName = nickName;
+            Level = level;
+            IsBan = isBan;
         }
 
-        public void GetBan()
+        public void Ban()
         {
-            _isBan = true;
+            IsBan = true;
         }
 
-        public void GetUnlock()
+        public void Unban()
         {
-            _isBan = false;
+            IsBan = false;
         }
     }
 }
