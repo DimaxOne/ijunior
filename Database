@@ -52,7 +52,7 @@ namespace PlayerData
                     case 2:
                         Console.Write("Введите id игрока для бана:");
                         int id = CheckNumber();
-                        if (id < 0 || id > _players.Count)
+                        if (id < 0 || id > _players.Count-1)
                         {
                             Console.WriteLine("Такого игрока не существует.");
                         }
@@ -64,7 +64,7 @@ namespace PlayerData
                     case 3:
                         Console.Write("Введите id игрока для разбана:");
                         int idUnlock = CheckNumber();
-                        if (idUnlock < 0 || idUnlock > _players.Count)
+                        if (idUnlock < 0 || idUnlock > _players.Count-1)
                         {
                             Console.WriteLine("Такого игрока не существует.");
                         }
@@ -76,7 +76,14 @@ namespace PlayerData
                     case 4:
                         Console.Write("Введите id игрока для удаления: ");
                         int idDelete = CheckNumber();
-                        DeletePlayer(idDelete);
+                        if (idDelete < 0 || idDelete > _players.Count-1)
+                        {
+                            Console.WriteLine("Такого игрока не существует.");
+                        }
+                        else
+                        {
+                            DeletePlayer(idDelete);
+                        }
                         break;
                     case 5:
                         ShowAllPlayers();
@@ -104,17 +111,8 @@ namespace PlayerData
 
         private void DeletePlayer(int id)
         {
-            bool checkId = id >= 0 && id < _players.Count;
-
-            if (checkId)
-            {
-                _players.RemoveAt(id);
-                Console.WriteLine("Игрок удален.");
-            }
-            else
-            {
-                Console.WriteLine("Такого игрока нет.");
-            }
+            _players.RemoveAt(id);
+            Console.WriteLine("Игрок удален.");
         }
 
         private void UnbanPlayer(int id)
