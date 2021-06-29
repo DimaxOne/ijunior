@@ -1,0 +1,182 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Store
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Player player = new Player();
+            Cashier cashier = new Cashier();
+
+            cashier.Work(player, cashier);
+        }
+    }
+
+    class Cashier
+    {
+        private List<Items> _items = new List<Items>();
+
+        public Cashier()
+        {
+            _items.Add(new Items("Меч уровня 1", 15));
+            _items.Add(new Items("Броня уровня 1", 13));
+            _items.Add(new Items("Щит уровня 1", 11));
+            _items.Add(new Items("Меч уровня 2", 28));
+            _items.Add(new Items("Броня уровня 2", 25));
+            _items.Add(new Items("Щит уровня 2", 23));
+            _items.Add(new Items("Меч уровня 3", 47));
+            _items.Add(new Items("Броня уровня 3", 42));
+            _items.Add(new Items("Щит уровня 3", 38));
+        }
+
+        public void Work(Player player, Cashier cashier)
+        {
+            while (_items.Count > 0)
+            {
+                Console.WriteLine($"У вас имеется: {player.ShowMoney()} золотых.\n");
+                ShowAllItems();
+                Console.WriteLine("\nКакой товар Вы желаете приобрести?");
+                string wantBuy = Console.ReadLine();
+                bool checkSearch = CheckItem(_items, wantBuy);
+
+                if (checkSearch)
+                {
+                    int itemId = GetItemId(_items, wantBuy);
+                    bool solvency = player.ChechSolvency(cashier, itemId);
+
+                    if (solvency)
+                    {
+                        Deal(player, itemId, cashier);
+                    }
+                    else
+                    {
+                        Console.WriteLine("У Вас недостаточно денег для покупки этого товара.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Такого товара нет.");
+                }
+
+                player.ShowItems();
+                Console.WriteLine("Для продолжения нажмите любую клавишу");
+                Console.ReadKey();
+                Console.Clear();
+            }
+        }
+
+        public int GetPrice(int i)
+        {
+            return _items[i].Price;
+        }
+        
+        private bool CheckItem(List<Items> items, string wantBuy)
+        {
+            for (int i = 0; i < _items.Count; i++)
+            {
+                if (_items[i].Name == wantBuy)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private int GetItemId(List<Items> items, string wantBuy)
+        {
+            int i = 0;
+            while (items[i].Name != wantBuy)
+            {
+                i++;
+            }
+
+            return i;
+        }
+
+        private void ShowAllItems()
+        {
+            Console.WriteLine("В начичии имеются: ");
+            foreach (var item in _items)
+            {
+                item.ShowInfo();
+            }
+        }
+
+        private void Deal(Player player, int id, Cashier cashier)
+        {
+            player.AddItem(_items[id].Name, cashier, id);
+            Console.WriteLine("Товар добавлен в вашу сумку.");
+            _items.RemoveAt(id);
+        }
+    }
+
+    class Player
+    {
+        private List<string> _bag;
+        private int _money;
+
+        public Player()
+        {
+            Random rand = new Random();
+            _money = rand.Next(100, 500);
+            _bag = new List<string>();
+        }
+
+        public bool ChechSolvency(Cashier cashier, int i)
+        {
+            if (_money >= cashier.GetPrice(i))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public void AddItem(string item, Cashier cashier, int i)
+        {
+            _bag.Add(item);
+            _money -= cashier.GetPrice(i);
+        }
+
+        public int ShowMoney()
+        {
+            return _money;
+        }
+
+        public void ShowItems()
+        {
+            Console.WriteLine("У вас имеются:");
+
+            foreach (var item in _bag)
+            {
+                Console.WriteLine(item);
+            }
+        }
+    }
+
+    class Items
+    {
+        public string Name { get; private set; }
+
+        public int Price { get; private set; }
+
+        public Items(string name, int price)
+        {
+            Name = name;
+            Price = price;
+        }
+
+        public void ShowInfo()
+        {
+            Console.WriteLine($"\"{Name}\" можно купизь за {Price} золотых монет");
+        }
+    }
+}
