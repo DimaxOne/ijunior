@@ -13,7 +13,7 @@ namespace Store
             Player player = new Player();
             Cashier cashier = new Cashier();
 
-            cashier.Work(player, cashier);
+            cashier.Work(player);
         }
     }
 
@@ -34,28 +34,24 @@ namespace Store
             _items.Add(new Items("Щит уровня 3", 38));
         }
 
-        public void Work(Player player, Cashier cashier)
+        public void Work(Player player)
         {
             while (_items.Count > 0)
             {
-                Console.WriteLine($"У вас имеется: {player.ShowMoney()} золотых.\n");
+                Console.WriteLine($"У вас имеется: {player.GetMoney()} золотых.\n");
                 ShowAllItems();
                 Console.WriteLine("\nКакой товар Вы желаете приобрести?");
-                string wantBuy = Console.ReadLine();
-                bool checkSearch = CheckItem(_items, wantBuy);
+                string itemName = Console.ReadLine();
+                bool checkSearch = CheckItem(itemName);
 
                 if (checkSearch)
                 {
-                    int itemId = GetItemId(_items, wantBuy);
-                    bool solvency = player.ChechSolvency(cashier, itemId);
+                    int itemId = GetItemId(itemName);
+                    bool IsCanPay = ChechSolvency(player, itemId);
 
-                    if (solvency)
+                    if (IsCanPay)
                     {
-                        Deal(player, itemId, cashier);
-                    }
-                    else
-                    {
-                        Console.WriteLine("У Вас недостаточно денег для покупки этого товара.");
+                        Deal(player, itemId);
                     }
                 }
                 else
@@ -69,17 +65,26 @@ namespace Store
                 Console.Clear();
             }
         }
-
-        public int GetPrice(int i)
-        {
-            return _items[i].Price;
-        }
         
-        private bool CheckItem(List<Items> items, string wantBuy)
+        private bool ChechSolvency(Player player, int itemId)
+        {
+            int money = player.GetMoney();
+            if (_items[itemId].Price > money)
+            {
+                Console.WriteLine("У вас недостаточно денег.");
+                return false;
+            }
+            else
+            {
+                return true;
+            } 
+        }
+
+        private bool CheckItem(string itemName)
         {
             for (int i = 0; i < _items.Count; i++)
             {
-                if (_items[i].Name == wantBuy)
+                if (_items[i].Name == itemName)
                 {
                     return true;
                 }
@@ -88,10 +93,10 @@ namespace Store
             return false;
         }
 
-        private int GetItemId(List<Items> items, string wantBuy)
+        private int GetItemId(string itemName)
         {
             int i = 0;
-            while (items[i].Name != wantBuy)
+            while (_items[i].Name != itemName)
             {
                 i++;
             }
@@ -108,9 +113,9 @@ namespace Store
             }
         }
 
-        private void Deal(Player player, int id, Cashier cashier)
+        private void Deal(Player player, int id)
         {
-            player.AddItem(_items[id].Name, cashier, id);
+            player.AddItem(_items[id].Name, _items[id].Price);
             Console.WriteLine("Товар добавлен в вашу сумку.");
             _items.RemoveAt(id);
         }
@@ -128,25 +133,13 @@ namespace Store
             _bag = new List<string>();
         }
 
-        public bool ChechSolvency(Cashier cashier, int i)
-        {
-            if (_money >= cashier.GetPrice(i))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public void AddItem(string item, Cashier cashier, int i)
+        public void AddItem(string item, int moneyToPay)
         {
             _bag.Add(item);
-            _money -= cashier.GetPrice(i);
+            _money -= moneyToPay;
         }
 
-        public int ShowMoney()
+        public int GetMoney()
         {
             return _money;
         }
