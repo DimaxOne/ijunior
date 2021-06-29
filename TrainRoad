@@ -1,0 +1,169 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace TrainRoad
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            List<Train> trains = new List<Train>();
+
+            while (true)
+            {
+                if (trains.Count == 0)
+                {
+                    Console.WriteLine("Поездов в пути нет.");
+                }
+                else
+                {
+                    foreach (var train in trains)
+                    {
+                        train.ShowInfo();
+                    }
+                }
+
+                Direction direction = new Direction("Москва");
+                direction.AddTown("Санкт-Петербург");
+                direction.AddTown("Нижний Новгород");
+                direction.AddTown("Казань");
+                direction.AddTown("Новосибирск");
+                direction.ShowAllTown();
+
+                Console.WriteLine("Введите город отправки поезда: ");
+                string cityOfDispatch = Console.ReadLine();
+                bool checkSearch = direction.CheckСityАvailability(cityOfDispatch);
+                if(checkSearch)
+                {
+                    Console.WriteLine($"Отправление из города: {cityOfDispatch}");
+                    Console.WriteLine("Введите город прибытия поезда: ");
+                    string cityOfArrival = Console.ReadLine();
+                    bool checkSearchArrival = direction.CheckСityАvailability(cityOfArrival);
+                    if (checkSearchArrival)
+                    {
+                        Console.WriteLine($"Прибытие в город: {cityOfArrival}");
+                        Passenger passengers = new Passenger();
+                        trains.Add(new Train(cityOfDispatch, cityOfArrival, passengers));
+                    }
+                }
+
+                Console.ReadKey();
+                Console.Clear();
+            }
+        }
+
+        class Direction
+        {
+            private List<string> _towns = new List<string>();
+
+            public Direction(string town)
+            {
+                _towns.Add(town);
+            }
+
+            public void AddTown(string town)
+            {
+                _towns.Add(town);
+            }
+
+            public void ShowAllTown()
+            {
+                for (int i = 0; i < _towns.Count; i++)
+                {
+                    Console.WriteLine($"{i+1}. {_towns[i]}");
+                }
+            }
+
+            public bool CheckСityАvailability(string town)
+            {
+                for (int i = 0; i < _towns.Count; i++)
+                {
+                    if (town == _towns[i])
+                    {
+                        return true;
+                    }
+                }
+                Console.WriteLine("Такого города нет в списке.");
+                return false;
+            }
+        }
+
+        class Passenger
+        {
+            private List<int> _ticket = new List<int>();
+            
+            public Passenger()
+            {
+                Random rand = new Random();
+                for (int i = 1; i < rand.Next(400, 800); i++)
+                {
+                    _ticket.Add(i);
+                }
+            }
+
+            public int GetPassengersCount()
+            {
+                return _ticket.Count;
+            }
+        }
+
+        class Train
+        {
+            private List<int []> _railwayCarriages = new List<int[]>();
+            private int _passengerCount;
+            private string _cityOfDispatch;
+            private string _cityOfArrival;
+
+            public Train(string сityOfDispatch, string сityOfArrival, Passenger passenger)
+            {
+                Random rand = new Random();
+                _passengerCount = passenger.GetPassengersCount();
+                _cityOfDispatch = сityOfDispatch;
+                _cityOfArrival = сityOfArrival;
+
+                int tempPassengers = _passengerCount;
+                int j = 0;
+                while (tempPassengers > 0)
+                {
+                    int arrayLenght = rand.Next(30, 75);
+
+                    if (tempPassengers < arrayLenght)
+                    {
+                        _railwayCarriages.Add(new int[tempPassengers]);
+                    }
+                    else
+                    {
+                        _railwayCarriages.Add(new int[arrayLenght]);
+                    }
+
+                    for (int i = 0; i < _railwayCarriages[_railwayCarriages.Count - 1].Length; i++)
+                    {
+                        _railwayCarriages[j][i] = i + 1;
+                    }
+
+                    tempPassengers -= arrayLenght;
+                    j++;
+                }
+            }
+
+            public void ShowInfo()
+            {
+                Console.WriteLine($"Поезд следует по маршруту: {_cityOfDispatch} - {_cityOfArrival}. " +
+                    $"Количество вагонов поезда - {_railwayCarriages.Count}. Общее количество пассажиров - " +
+                    $"{_passengerCount}");
+                ShowCarriagesInfo();
+            }
+
+            private void ShowCarriagesInfo()
+            {
+                for (int i = 0; i < _railwayCarriages.Count; i++)
+                {
+                    Console.WriteLine($"В вагоне {i+1} следует: {_railwayCarriages[i].Length} пассажиров.");
+                }
+            }
+        }
+    }
+}
