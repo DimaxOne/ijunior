@@ -27,8 +27,6 @@ namespace Fighters
             _fighters.Add(new Archer(300, 50, 10));
             _fighters.Add(new Mage(320, 55, 10));
 
-            Random rand = new Random();
-
             for (int i = 0; i < _fighters.Count; i++)
             {
                 _fighters[i].ShowInfo();
@@ -42,6 +40,12 @@ namespace Fighters
 
             Fighters fighterSecond = СhoiceFighter();
             Console.WriteLine("Второй боец выбран.\nБой!\n");
+
+            if (fighterFirst.Type == fighterSecond.Type)
+            {
+                CreateDifferentFighter(fighterFirst);
+                fighterSecond = _fighters[_fighters.Count - 1];
+            }
 
             int round = 0;
 
@@ -81,6 +85,34 @@ namespace Fighters
             else if (fighterFirst.Health <= 0)
             {
                 Console.WriteLine($"\n{fighterSecond.Type} победил.");
+            }
+        }
+        
+        //Так и не придумал как вернуть нужный мне класс без такого метода
+        private void CreateDifferentFighter(Fighters fighter)
+        {
+            int indexFighter = GetIndexFighter(fighter.Type);
+
+            switch (indexFighter)
+            {
+                case 0:
+                    _fighters.Add(new Warrior(500, 40, 50));
+                    break;
+                case 1:
+                    _fighters.Add(new Assasin(350, 50, 15));
+                    break;
+                case 2:
+                    _fighters.Add(new Nosferatu(400, 30, 20));
+                    break;
+                case 3:
+                    _fighters.Add(new Archer(300, 50, 10));
+                    break;
+                case 4:
+                    _fighters.Add(new Mage(320, 55, 10));
+                    break;
+                default:
+                    Console.WriteLine("Все пропало, боя не будет!");
+                    break;
             }
         }
 
