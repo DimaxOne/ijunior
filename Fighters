@@ -23,9 +23,11 @@ namespace Fighters
         {
             _fighters.Add(new Warrior(500, 40, 50));
             _fighters.Add(new Assasin(350, 50, 15));
-            _fighters.Add(new Nosferatu(400, 40, 20));
+            _fighters.Add(new Nosferatu(400, 30, 20));
             _fighters.Add(new Archer(300, 50, 10));
-            _fighters.Add(new Mage(320, 70, 10));
+            _fighters.Add(new Mage(320, 55, 10));
+
+            Random rand = new Random();
 
             for (int i = 0; i < _fighters.Count; i++)
             {
@@ -35,72 +37,29 @@ namespace Fighters
 
         public void Battle()
         {
-            Console.WriteLine("Выберите класс первого бойца: ");
-            string fihterFirst = Console.ReadLine();
-            bool IsRightChose = CheckFighter(fihterFirst);
-            if (IsRightChose)
+            Fighters fighterFirst = СhoiceFighter();
+            Console.WriteLine("Первый боец выбран.");
+
+            Fighters fighterSecond = СhoiceFighter();
+            Console.WriteLine("Второй боец выбран.\nБой!\n");
+
+            int round = 0;
+
+            while (fighterFirst.Health > 0 && fighterSecond.Health > 0)
             {
-                int fighterFirstIndex = GetIndexFighter(fihterFirst);
-                Console.WriteLine("Выберите класс второго бойца: ");
-                string fihterSecond = Console.ReadLine();
-                bool IsRightChoseSecond = CheckFighter(fihterSecond);
-                if (IsRightChoseSecond)
-                {
-                    int fighterSecondIndex = GetIndexFighter(fihterSecond);
-                    int round = 0;
-
-                    while (_fighters[fighterFirstIndex].GetHealth() > 0 && _fighters[fighterSecondIndex].GetHealth() > 0)
-                    {
-                        Random rand = new Random();
-                        System.Threading.Thread.Sleep(100);
-
-                        _fighters[fighterFirstIndex].UseSkill(round, rand, _fighters[fighterSecondIndex]);
-                        _fighters[fighterFirstIndex].TakeDamage(_fighters[fighterSecondIndex].GetDamage());
-                        Console.WriteLine($"{fihterSecond} проводит атаку. " +
-                            $"{fihterFirst} имеет {_fighters[fighterFirstIndex].GetHealth()} жизней.");
-
-                        _fighters[fighterSecondIndex].UseSkill(round, rand, _fighters[fighterFirstIndex]);
-                        _fighters[fighterSecondIndex].TakeDamage(_fighters[fighterFirstIndex].GetDamage());
-                        Console.WriteLine($"{fihterFirst} проводит атаку. " +
-                            $"{fihterSecond} имеет {_fighters[fighterSecondIndex].GetHealth()} жизней.");
-
-                        _fighters[fighterFirstIndex].RestoreParameters(round);
-                        _fighters[fighterSecondIndex].RestoreParameters(round);
-
-
-                        if (_fighters[fighterFirstIndex].GetHealth() <= 0 && _fighters[fighterSecondIndex].GetHealth() <= 0)
-                        {
-                            Console.WriteLine("Ничья.");
-                        }
-                        else if (_fighters[fighterSecondIndex].GetHealth() <= 0)
-                        {
-                            Console.WriteLine($"\n{fihterFirst} победил.");
-                        }
-                        else if (_fighters[fighterFirstIndex].GetHealth() <= 0)
-                        {
-                            Console.WriteLine($"\n{fihterSecond} победил.");
-                        }
-
-                        round++;
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Боец выбран неверно.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Боец выбран неверно.");
-            }
+                BattleOneRound(fighterFirst, fighterSecond, round);
+                DetermineWinner(fighterFirst, fighterSecond);
+                round++;
+                System.Threading.Thread.Sleep(100);
+            }   
         }
 
-        private bool CheckFighter(string name)
+        private bool CheckPresenceFighter(string name)
         {
             bool result = false;
             for (int i = 0; i < _fighters.Count; i++)
             {
-                if (_fighters[i].TakeType() == name)
+                if (_fighters[i].Type == name)
                 {
                     result = true;
                 }
@@ -109,24 +68,75 @@ namespace Fighters
             return result;
         }
 
+        private void DetermineWinner(Fighters fighterFirst, Fighters fighterSecond)
+        {
+            if (fighterFirst.Health <= 0 && fighterSecond.Health <= 0)
+            {
+                Console.WriteLine("Ничья.");
+            }
+            else if (fighterSecond.Health <= 0)
+            {
+                Console.WriteLine($"\n{fighterFirst.Type} победил.");
+            }
+            else if (fighterFirst.Health <= 0)
+            {
+                Console.WriteLine($"\n{fighterSecond.Type} победил.");
+            }
+        }
+
         private int GetIndexFighter(string name)
         {
             int i = 0;
-            while (_fighters[i].TakeType() != name)
+            while (_fighters[i].Type != name)
             {
                 i++;
             }
 
             return i;
         }
+
+        private void BattleOneRound(Fighters fighterFirst, Fighters fighterSecond, int round)
+        {
+            fighterFirst.UseSkill(round, fighterSecond);
+            fighterSecond.UseSkill(round, fighterSecond);
+
+            fighterFirst.TakeDamage(fighterSecond.Damage);
+            Console.WriteLine($"{fighterSecond.Type} проводит атаку. {fighterFirst.Type} имеет " +
+                $"{fighterFirst.Health} жизней.");
+            fighterSecond.TakeDamage(fighterFirst.Damage);
+            Console.WriteLine($"{fighterFirst.Type} проводит атаку. {fighterSecond.Type} имеет " +
+                $"{fighterSecond.Health} жизней.");
+
+            fighterFirst.RestoreParameters(round);
+            fighterSecond.RestoreParameters(round);
+        }
+
+        private Fighters СhoiceFighter()
+        {
+            bool IsRightChoice = false;
+            string fighter = "";
+
+            while (IsRightChoice != true)
+            {
+                Console.WriteLine("Выберите класс бойца: ");
+                fighter = Console.ReadLine();
+                IsRightChoice = CheckPresenceFighter(fighter);
+                if(!IsRightChoice)
+                {
+                    Console.WriteLine("Боец выбран неправильно.");
+                }
+            }
+
+            return _fighters[GetIndexFighter(fighter)];
+        }
     }
 
     class Fighters
     {
-        protected string Type;
-        protected int Health;
-        protected int Damage;
-        protected int Armor;
+        public string Type { get; protected set; }
+        public int Health { get; protected set; }
+        public int Damage { get; protected set; }
+        public int Armor { get; protected set; }
 
         public Fighters(int health, int damage, int armor, string type)
         {
@@ -141,33 +151,13 @@ namespace Fighters
             Console.WriteLine("У меня нет способностей.");
         }
 
-        public virtual void UseSkill(int round, Random rand, Fighters fighter) { }
+        public virtual void UseSkill(int round, Fighters fighter) { }
 
         public virtual void RestoreParameters(int round) { }
 
         public void TakeDamage(int damage)
         {
             Health -= damage * damage / (damage + Armor);
-        }
-
-        public int GetHealth()
-        {
-            return Health;
-        }
-
-        public int GetDamage()
-        {
-            return Damage;
-        }
-
-        public int GetArmor()
-        {
-            return Armor;
-        }
-
-        public string TakeType()
-        {
-            return Type;
         }
 
         public void ShowInfo()
@@ -188,7 +178,7 @@ namespace Fighters
             Console.WriteLine("Воин способен временно увеличить свою броню.\n");
         }
 
-        public override void UseSkill(int round, Random rand, Fighters fighter)
+        public override void UseSkill(int round, Fighters fighter)
         {
             _tempArmor = Armor;
 
@@ -208,18 +198,24 @@ namespace Fighters
     class Assasin : Fighters
     {
         private int _tempDamage;
-        public Assasin(int health, int damage, int armor, string type = "Убийца") : base(health, damage, armor, type) { }
+        private Random random;
+
+        public Assasin(int health, int damage, int armor, string type = "Убийца") : base(health, damage, armor, type) 
+        {
+            Random rand = new Random();
+            random = rand;
+        }
 
         public override void ShowSkill()
         {
             Console.WriteLine("Убийца с определенным шансом наносит критический урон.\n");
         }
 
-        public override void UseSkill(int round, Random rand, Fighters fighter)
+        public override void UseSkill(int round, Fighters fighter)
         {
             _tempDamage = Damage;
 
-            if (rand.Next(0, 101) < 20)
+            if (random.Next(0, 101) < 20)
             {
                 Console.WriteLine(Type + " применяет способность.");
                 Damage *= 3;
@@ -241,9 +237,9 @@ namespace Fighters
             Console.WriteLine("Вампир обладает способностью восстанавливать здоровье в зависимости от своего урона.\n");
         }
 
-        public override void UseSkill(int round, Random rand, Fighters fighter)
+        public override void UseSkill(int round, Fighters fighter)
         {
-            Health += Damage - Damage * fighter.GetArmor() / 100;
+            Health += Damage - Damage * fighter.Armor / 100;
         }
     }
 
@@ -258,15 +254,14 @@ namespace Fighters
             Console.WriteLine("Лучник может оглушить врага на короткое время.\n");
         }
 
-        public override void UseSkill(int round, Random rand, Fighters fighter)
+        public override void UseSkill(int round, Fighters fighter)
         {
             if (round != 0 && (round % 3) == 0)
             {
                 _tempHealth = Health;
                 Console.WriteLine(Type + " применяет способность.");
                 Armor += 20;
-            }
-            
+            } 
         }
 
         public override void RestoreParameters(int round)
@@ -274,6 +269,7 @@ namespace Fighters
             if (round != 0 && (round % 3) == 0)
             {
                 Health = _tempHealth;
+                Console.WriteLine("Здоровье лучника " + Health);
             }  
         }
     }
@@ -289,7 +285,7 @@ namespace Fighters
             Console.WriteLine("Маг может поджечь врага на определенный период.\n");
         }
 
-        public override void UseSkill(int round, Random rand, Fighters fighter)
+        public override void UseSkill(int round, Fighters fighter)
         {
             _tempDamage = Damage;
 
