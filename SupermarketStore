@@ -1,0 +1,223 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace SupermarketStore
+{
+    class Program
+    {
+        static void Main(string[] args)
+        
+        {
+            Supermarket supermarket = new Supermarket();
+            supermarket.Work();
+        }
+    }
+
+    class Supermarket
+    {
+        private Queue<Client> _clients = new Queue<Client>();
+        private Dictionary<string, int> _products = new Dictionary<string, int>();
+        private string[] _basket;
+        private int _money = 0;
+        private int _moneyToPay = 0;
+        private Random random;
+
+        public Supermarket()
+        {
+            Random rand = new Random();
+            random = rand;
+
+            for (int i = 0; i < rand.Next(10, 40); i++)
+            {
+                _clients.Enqueue(new Client());
+                System.Threading.Thread.Sleep(100);
+            }
+
+            CreateProductList();
+        }
+
+        public void Work()
+        {
+            for (int i = 0; 0 < _clients.Count; i++)
+            {
+                bool isProductRemove = false;
+                Console.WriteLine($"В кассе магазина {_money} рублей.");
+                CreateBasket();
+                _moneyToPay = CalculatePurchaseAmount();
+
+                while (CheckClientSolvency(_clients.Peek()) != true)
+                {
+                    isProductRemove = true;
+                    _moneyToPay = CalculatePurchaseAmount();
+                    ShowDealInfo();
+                    DeleteSomeProduct();
+                    Console.WriteLine("\nУ покупателя не хватало денег. Убран один из продуктов.");
+                    
+                    Console.ReadKey();
+                }
+
+                if(!isProductRemove)
+                {
+                    ShowDealInfo();
+                }
+                
+                Deal();
+                _clients.Dequeue();
+                Console.WriteLine("Покупка завершена.");
+
+                Console.WriteLine("Нажмите любую клавишу для продолжения.");
+                Console.ReadKey();
+                _basket = null;
+                Console.Clear();
+            }
+        }
+
+        private void CreateProductList()
+        {
+            _products.Add("Картофель", 40);
+            _products.Add("Морковь", 30);
+            _products.Add("Огурцы", 60);
+            _products.Add("Помидоры", 65);
+            _products.Add("Хлеб", 20);
+            _products.Add("Свекла", 70);
+            _products.Add("Лук", 30);
+            _products.Add("Чеснок", 25);
+            _products.Add("Перец", 80);
+            _products.Add("Соль", 36);
+            _products.Add("Сахар", 25);
+            _products.Add("Яблоки", 64);
+            _products.Add("Груши", 70);
+            _products.Add("Бананы", 90);
+            _products.Add("Икра", 500);
+            _products.Add("Свинина", 400);
+            _products.Add("Говядина", 500);
+            _products.Add("Курица", 300);
+        }
+
+        private void ShowBasketInfo()
+        {
+            for (int i = 0; i < _basket.Length; i++)
+            {
+                Console.WriteLine(_basket[i]);
+            }
+        }
+
+        private void ShowDealInfo()
+        {
+            Console.WriteLine($"У покупалетя {_clients.Peek().GetMoney()} рублей.\nВ корзине покупателя находятся:");
+            ShowBasketInfo();
+            Console.WriteLine($"\nСумма к оплате: {_moneyToPay}");
+        }
+
+        private bool CheckClientSolvency(Client client)
+        {
+            if (_moneyToPay < client.GetMoney())
+            {
+                return true;
+            }
+
+            _moneyToPay = 0;
+            return false;
+        }
+
+        private void DeleteSomeProduct()
+        {
+            int index = random.Next(0, _basket.Length);
+            string[] tempArray = new string[_basket.Length-1];
+
+            for (int i = 0; i <= tempArray.Length; i++)
+            {
+                if (i < index)
+                {
+                    tempArray[i] = _basket[i];
+                }
+                else if (i == index)
+                {
+                    continue;
+                }
+                else if (i > index)
+                {
+                    tempArray[i-1] = _basket[i];
+                }
+            }
+
+            _basket = tempArray;
+        }
+
+        private int CalculatePurchaseAmount()
+        {
+            int sum = 0;
+
+            for (int i = 0; i < _basket.Length; i++)
+            {
+                foreach (var product in _products)
+                {
+                    if(product.Key == _basket[i])
+                    {
+                        sum += product.Value;
+                        break;
+                    }
+                }
+            }
+
+            return sum;
+        }
+
+        private void Deal()
+        {
+            _money += _moneyToPay;
+        }
+
+        private void CreateBasket()
+        {
+            int arrayLenght = random.Next(1, 19);
+            int i = 0;
+            _basket = new string[arrayLenght];
+
+            while (i < _basket.Length)
+            {
+                foreach (var product in _products)
+                {
+                    if (random.Next(0, 2) > 0)
+                    {
+                         _basket[i] = product.Key;
+                         i++;
+                    }
+                    if (i == arrayLenght)
+                        break;
+                }
+            }
+        }
+    }
+
+    class Client
+    {
+        private int _money;
+
+        public Client()
+        {
+            Random rand = new Random();
+            _money = rand.Next(500, 3500);
+        }
+
+        public int GetMoney()
+        {
+            return _money;
+        }
+    }
+
+    class Product
+    {
+        public string Name { get; private set; }
+        public int Price { get; private set; }
+
+        public Product(string name, int price)
+        {
+            Name = name;
+            Price = price;
+        }
+    }
+}
