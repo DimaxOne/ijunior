@@ -23,14 +23,11 @@ namespace SupermarketStore
         private string[] _basket;
         private int _money = 0;
         private int _moneyToPay = 0;
-        private Random random;
+        private Random _rand = new Random();
 
         public Supermarket()
         {
-            Random rand = new Random();
-            random = rand;
-
-            for (int i = 0; i < rand.Next(10, 40); i++)
+            for (int i = 0; i < _rand.Next(10, 40); i++)
             {
                 _clients.Enqueue(new Client());
                 System.Threading.Thread.Sleep(100);
@@ -125,7 +122,7 @@ namespace SupermarketStore
 
         private void DeleteSomeProduct()
         {
-            int index = random.Next(0, _basket.Length);
+            int index = _rand.Next(0, _basket.Length);
             string[] tempArray = new string[_basket.Length-1];
 
             for (int i = 0; i <= tempArray.Length; i++)
@@ -173,7 +170,7 @@ namespace SupermarketStore
 
         private void CreateBasket()
         {
-            int arrayLenght = random.Next(1, 19);
+            int arrayLenght = _rand.Next(1, 19);
             int i = 0;
             _basket = new string[arrayLenght];
 
@@ -181,7 +178,7 @@ namespace SupermarketStore
             {
                 foreach (var product in _products)
                 {
-                    if (random.Next(0, 2) > 0)
+                    if (_rand.Next(0, 2) > 0)
                     {
                          _basket[i] = product.Key;
                          i++;
@@ -221,3 +218,4 @@ namespace SupermarketStore
         }
     }
 }
+
