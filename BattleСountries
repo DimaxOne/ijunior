@@ -30,21 +30,21 @@ namespace BattleСountries
         {
             while(_countryFirst.ShowPlatoonCount() > 0 && _countrySecond.ShowPlatoonCount() > 0)
             {
-                _countryFirst.AttackOpponents(_countrySecond.ReturnSomeSoldier());
-                _countrySecond.AttackOpponents(_countryFirst.ReturnSomeSoldier());
+                _countryFirst.AttackOpponents(_countrySecond.ReturnAndUseSkillSomeSoldier());
+                _countrySecond.AttackOpponents(_countryFirst.ReturnAndUseSkillSomeSoldier());
                 
-                _countryFirst.CheckKilledSoldiers();
-                _countrySecond.CheckKilledSoldiers();
+                _countryFirst.RemoveKilledSoldiers();
+                _countrySecond.RemoveKilledSoldiers();
 
                 Console.Write("Первая страна: ");
                 _countryFirst.ShowPlatoonInfo();
                 Console.Write("Вторая страна: ");
                 _countrySecond.ShowPlatoonInfo();
 
-                ShowWinner();
-
                 Console.ReadKey();
             }
+
+            ShowWinner();
         }
 
         private void ShowWinner()
@@ -71,10 +71,10 @@ namespace BattleСountries
 
         public Country()
         {
-            CreatePlatoonCountry();
+            CreatePlatoon();
         }
 
-        public void CreatePlatoonCountry()
+        public void CreatePlatoon()
         {
             for (int i = 0; i < _rand.Next(5, 10); i++)
             {
@@ -101,7 +101,7 @@ namespace BattleСountries
             }
         }
 
-        public Soldier ReturnSomeSoldier()
+        public Soldier ReturnAndUseSkillSomeSoldier()
         {
             int indexSoldier = _rand.Next(0, _platoonCountry.Count);
             _platoonCountry[indexSoldier].UseSkill();
@@ -113,7 +113,7 @@ namespace BattleСountries
             return _platoonCountry.Count();
         }
 
-        public void CheckKilledSoldiers()
+        public void RemoveKilledSoldiers()
         {
             for (int i = 0; i < _platoonCountry.Count; i++)
             {
@@ -164,8 +164,9 @@ namespace BattleСountries
         }
     }
 
-    class Soldier
-    {
+    
+   abstract class Soldier
+   {
         public bool IsSkillUse { get; protected set; }
         public int Health { get; protected set; }
         public int Damage { get; protected set; }
@@ -186,8 +187,8 @@ namespace BattleСountries
             Health -= damage * damage / (damage + Armor);
         }
 
-        public virtual void UseSkill() { }
-    }
+        public abstract void UseSkill();
+   }
 
     class Scout : Soldier
     {
