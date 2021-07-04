@@ -1,0 +1,248 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace BattleСountries
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            War war = new War();
+            war.Battle();
+        }
+    }
+
+    class War
+    {
+        private Country _countryFirst;
+        private Country _countrySecond;
+
+        public War()
+        {
+            _countryFirst = new Country();
+            _countrySecond = new Country();
+        }
+
+        public void Battle()
+        {
+            while(_countryFirst.ShowPlatoonCount() > 0 && _countrySecond.ShowPlatoonCount() > 0)
+            {
+                _countryFirst.AttackOpponents(_countrySecond.ReturnSomeSoldier());
+                _countrySecond.AttackOpponents(_countryFirst.ReturnSomeSoldier());
+                
+                _countryFirst.CheckKilledSoldiers();
+                _countrySecond.CheckKilledSoldiers();
+
+                Console.Write("Первая страна: ");
+                _countryFirst.ShowPlatoonInfo();
+                Console.Write("Вторая страна: ");
+                _countrySecond.ShowPlatoonInfo();
+
+                ShowWinner();
+
+                Console.ReadKey();
+            }
+        }
+
+        private void ShowWinner()
+        {
+            if(_countryFirst.ShowPlatoonCount() == 0 && _countrySecond.ShowPlatoonCount() == 0)
+            {
+                Console.WriteLine("\nВсе погибли. Победителей нет.");
+            }
+            else if (_countryFirst.ShowPlatoonCount() == 0)
+            {
+                Console.WriteLine("\nВторая страна победила.");
+            }
+            else if (_countrySecond.ShowPlatoonCount() == 0)
+            {
+                Console.WriteLine("\nПервая страна победила.");
+            }
+        }
+    }
+
+    class Country
+    {
+        private List<Soldier> _platoonCountry = new List<Soldier>();
+        private Random _rand = new Random();
+
+        public Country()
+        {
+            CreatePlatoonCountry();
+        }
+
+        public void CreatePlatoonCountry()
+        {
+            for (int i = 0; i < _rand.Next(5, 10); i++)
+            {
+                _platoonCountry.Add(new Scout(_rand.Next(270, 300), _rand.Next(150, 200), _rand.Next(10, 15)));
+                System.Threading.Thread.Sleep(10);
+            }
+
+            for (int i = 0; i < _rand.Next(10, 20); i++)
+            {
+                _platoonCountry.Add(new Infantryman(_rand.Next(350, 400), _rand.Next(100, 150), _rand.Next(15, 20)));
+                System.Threading.Thread.Sleep(10);
+            }
+
+            for (int i = 0; i < _rand.Next(10, 15); i++)
+            {
+                _platoonCountry.Add(new Bomber(_rand.Next(270, 320), _rand.Next(250, 500), _rand.Next(30, 40)));
+                System.Threading.Thread.Sleep(10);
+            }
+
+            for (int i = 0; i < _rand.Next(10, 15); i++)
+            {
+                _platoonCountry.Add(new Sniper(_rand.Next(200, 250), _rand.Next(300, 350), _rand.Next(5, 10)));
+                System.Threading.Thread.Sleep(10);
+            }
+        }
+
+        public Soldier ReturnSomeSoldier()
+        {
+            int indexSoldier = _rand.Next(0, _platoonCountry.Count);
+            _platoonCountry[indexSoldier].UseSkill();
+            return _platoonCountry[indexSoldier];
+        }
+
+        public int ShowPlatoonCount()
+        {
+            return _platoonCountry.Count();
+        }
+
+        public void CheckKilledSoldiers()
+        {
+            for (int i = 0; i < _platoonCountry.Count; i++)
+            {
+                if (_platoonCountry[i].Health <= 0)
+                {
+                    _platoonCountry.RemoveAt(i);
+                }
+            }
+        }
+
+        public void ShowPlatoonInfo()
+        {
+            int scoutCount = 0;
+            int infantrymanCount = 0;
+            int bomberCount = 0;
+            int sniperCount = 0;
+
+            foreach (var soldier in _platoonCountry)
+            {
+                string name = soldier.Name;
+                switch (name)
+                {
+                    case "Разведчик":
+                        scoutCount++;
+                        break;
+                    case "Пехотинец":
+                        infantrymanCount++;
+                        break;
+                    case "Подрывник":
+                        bomberCount++;
+                        break;
+                    case "Снайпер":
+                        sniperCount++;
+                        break;
+                    default:
+                        Console.WriteLine("Все пропало. Неведанная ошибка.");
+                        break;
+                }
+            }
+
+            Console.WriteLine($"во взводе имеется: {scoutCount} разведчиков, {infantrymanCount} пехотинцев, " +
+                $"{bomberCount} подрывников и {sniperCount} снайперов.");
+        }
+
+        public void AttackOpponents(Soldier soldier)
+        {
+            _platoonCountry[_rand.Next(0, _platoonCountry.Count)].TakeDamage(soldier.Damage);
+        }
+    }
+
+    class Soldier
+    {
+        public bool IsSkillUse { get; protected set; }
+        public int Health { get; protected set; }
+        public int Damage { get; protected set; }
+        public int Armor { get; protected set; }
+        public string Name { get; private set; }
+
+        public Soldier(int health, int damage, int armor, string name)
+        {
+            IsSkillUse = false;
+            Health = health;
+            Damage = damage;
+            Armor = armor;
+            Name = name;
+        }
+
+        public void TakeDamage(int damage)
+        {
+            Health -= damage * damage / (damage + Armor);
+        }
+
+        public virtual void UseSkill() { }
+    }
+
+    class Scout : Soldier
+    {
+        public Scout(int health, int damage, int armor, string name = "Разведчик"): base(health, damage, armor, name) { }
+
+        public override void UseSkill()
+        {
+            if (IsSkillUse == false)
+            {
+                Health += 150;
+                IsSkillUse = true;
+            }
+        }
+    }
+
+    class Infantryman : Soldier
+    {
+        public Infantryman(int health, int damage, int armor, string name = "Пехотинец") : base(health, damage, armor, name) { }
+
+        public override void UseSkill()
+        {
+            if (IsSkillUse == false)
+            {
+                Armor += 30;
+                IsSkillUse = true;
+            }
+        }
+    }
+
+    class Bomber : Soldier
+    {
+        public Bomber(int health, int damage, int armor, string name = "Подрывник") : base(health, damage, armor, name) { }
+
+        public override void UseSkill()
+        {
+            if (IsSkillUse == false)
+            {
+                Health -= 250;
+                Damage += 400;
+                IsSkillUse = true;
+            }
+        }
+    }
+
+    class Sniper : Soldier
+    {
+        public Sniper(int health, int damage, int armor, string name = "Снайпер") : base(health, damage, armor, name) { }
+
+        public override void UseSkill()
+        {
+            if (IsSkillUse == false)
+            {
+                Damage += 150;
+                IsSkillUse = true;
+            }
+        }
+    }
+}
