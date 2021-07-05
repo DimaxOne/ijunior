@@ -63,8 +63,8 @@ namespace Aquarium
                         break;
                     case "2":
                         Console.WriteLine("Рыбу с каким порядковым номером нужно убрать?");
-                        bool result = int.TryParse(Console.ReadLine(), out int x);
-                        if (result && x > 0 && x < _fishes.Count + 1)
+                        bool isNumberExists = int.TryParse(Console.ReadLine(), out int x);
+                        if (isNumberExists && x > 0 && x < _fishes.Count + 1)
                         {
                             RemoveFish(x);
                         }  
