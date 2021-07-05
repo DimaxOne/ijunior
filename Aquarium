@@ -1,0 +1,153 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Aquarium
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Aquarium aquarium = new Aquarium();
+            aquarium.Function();
+        }
+    }
+
+    class Aquarium
+    {
+        private List<Fish> _fishes = new List<Fish>();
+        private int _maximumFish;
+        private bool _isWork = true;
+        private Random _random = new Random();
+
+        public Aquarium()
+        {
+            _maximumFish = _random.Next(10, 30);
+
+            for (int i = 0; i < _maximumFish; i++)
+            {
+                _fishes.Add(new Fish(0, _random.Next(15, 20)));
+                System.Threading.Thread.Sleep(10);
+            }
+        }
+
+        public void Function()
+        {
+            while (_isWork)
+            {
+                Console.WriteLine("Сейчас в аквариуме:");
+                ShowInfo();
+
+                Console.WriteLine("\nВы можете:\n1. Добавить рыбу в аквариум при наличии места;\n2. Убрать рыбу из аквариума;" +
+                    "\n3. Уйти от аквариума.\nВо всех других случаях жизнь будет продолжаться. Введите число для команды " +
+                    "или нажмите любую другую клавишу.");
+                string userInput = Console.ReadLine();
+
+                switch (userInput)
+                {
+                    case "1":
+                        if (_fishes.Count < _maximumFish)
+                        {
+                            AddFish();
+                        }
+                        else
+                        {
+                            Console.WriteLine("В аквариуме нет места.");
+                        }
+                        Console.ReadKey();
+                        break;
+                    case "2":
+                        Console.WriteLine("Рыбу с каким порядковым номером нужно убрать?");
+                        bool result = int.TryParse(Console.ReadLine(), out int x);
+                        if (result && x > 0 && x < _fishes.Count + 1)
+                        {
+                            RemoveFish(x);
+                        }  
+                        else
+                        {
+                            Console.WriteLine("Такой рыбы нет в списке.");
+                        }  
+                        Console.ReadKey();
+                        break;
+                    case "3":
+                        Console.WriteLine("До встречи!");
+                        _isWork = false;
+                        break;
+                    default:
+                        EndOneYear();
+                        break;
+                }
+
+                Console.Clear();
+            }
+        }
+
+        private void ShowInfo()
+        {
+            int i = 1;
+            foreach (var fish in _fishes)
+            {
+                bool isDie = fish.CheckDie();
+                if (isDie == false)
+                {
+                    Console.WriteLine($"{i} рыбе сейчас {fish.Age} лет. Она может прожить до {fish.MaximumAge} лет.");
+                }
+                else
+                {
+                    Console.WriteLine($"{i} рыба умерла.");
+                }
+                
+                i++;
+            }
+        }
+
+        private void EndOneYear()
+        {
+            foreach (var fish in _fishes)
+            {
+                fish.SubtractOneYear();
+            }
+        }
+
+        private void AddFish()
+        {
+            _fishes.Add(new Fish(0, _random.Next(15, 20)));
+            Console.WriteLine("Рыба добавлена.");
+        }
+
+        private void RemoveFish(int index)
+        {
+            _fishes.RemoveAt(index-1);
+            Console.WriteLine("Рыба удалена из аквариума.");
+        }
+    }
+
+    class Fish
+    {
+        public int Age { get; private set; }
+        public int MaximumAge { get; private set; }
+
+        public Fish(int age, int maximumAge)
+        {
+            Age = age;
+            MaximumAge = maximumAge;
+        }
+
+        public void SubtractOneYear()
+        {
+            Age++;
+        }
+
+        public bool CheckDie()
+        {
+            if (Age == MaximumAge)
+            {
+                return true;
+            }
+
+            return false;
+        }
+    }
+}
