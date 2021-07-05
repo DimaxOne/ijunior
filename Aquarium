@@ -11,19 +11,22 @@ namespace Aquarium
         static void Main(string[] args)
         {
             Aquarium aquarium = new Aquarium();
-            aquarium.Function();
+            aquarium.Work();
         }
     }
 
     class Aquarium
     {
-        private List<Fish> _fishes = new List<Fish>();
+        private List<Fish> _fishes;
         private int _maximumFish;
-        private bool _isWork = true;
-        private Random _random = new Random();
+        private bool _isWork;
+        private Random _random;
 
         public Aquarium()
         {
+            _fishes = new List<Fish>();
+            _isWork = true;
+            _random = new Random();
             _maximumFish = _random.Next(10, 30);
 
             for (int i = 0; i < _maximumFish; i++)
@@ -33,7 +36,7 @@ namespace Aquarium
             }
         }
 
-        public void Function()
+        public void Work()
         {
             while (_isWork)
             {
@@ -86,20 +89,17 @@ namespace Aquarium
 
         private void ShowInfo()
         {
-            int i = 1;
-            foreach (var fish in _fishes)
+            for (int i = 0; i < _fishes.Count; i++)
             {
-                bool isDie = fish.CheckDie();
+                bool isDie = _fishes[i].CheckDie();
                 if (isDie == false)
                 {
-                    Console.WriteLine($"{i} рыбе сейчас {fish.Age} лет. Она может прожить до {fish.MaximumAge} лет.");
+                    Console.WriteLine($"{i+1} рыбе сейчас {_fishes[i].Age} лет. Она может прожить до {_fishes[i].MaximumAge} лет.");
                 }
                 else
                 {
-                    Console.WriteLine($"{i} рыба умерла.");
+                    Console.WriteLine($"{i+1} рыба умерла.");
                 }
-                
-                i++;
             }
         }
 
@@ -107,7 +107,7 @@ namespace Aquarium
         {
             foreach (var fish in _fishes)
             {
-                fish.SubtractOneYear();
+                fish.AppendOneYear();
             }
         }
 
@@ -135,19 +135,14 @@ namespace Aquarium
             MaximumAge = maximumAge;
         }
 
-        public void SubtractOneYear()
+        public void AppendOneYear()
         {
             Age++;
         }
 
         public bool CheckDie()
         {
-            if (Age == MaximumAge)
-            {
-                return true;
-            }
-
-            return false;
+            return Age > MaximumAge;
         }
     }
 }
