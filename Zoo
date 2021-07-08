@@ -23,14 +23,10 @@ namespace Zoo
             {
                 _aviaries = new List<Aviary>();
                 _isWork = true;
-                _aviaries.Add(new Aviary("Северный вольер"));
-                _aviaries[0].CreateMonkey();
-                _aviaries.Add(new Aviary("Восточный вольер"));
-                _aviaries[1].CreateElephant();
-                _aviaries.Add(new Aviary("Южный вольер"));
-                _aviaries[2].CreateGoat();
-                _aviaries.Add(new Aviary("Западный вольер"));
-                _aviaries[3].CreateTiger();
+                CreateAviary("Северный вольер", "обезьяна", "У-у-у");
+                CreateAviary("Восточный вольер", "слон", "который невозможно услышать");
+                CreateAviary("Южный вольер", "козёл", "Ме-е-е-е");
+                CreateAviary("Восточный вольер", "тигр", "Р-р-р");
             }
 
             public void Work()
@@ -40,34 +36,38 @@ namespace Zoo
                     Console.WriteLine("В зоопарке имеются 4 вольера:\n1. Северный вольер;\n2. Восточный вольер;" +
                         "\n3. Южный вольер;\n4. Западный вольер;\n5. Уйти домой.\nВольер с каким номером вы хотите посетить?");
 
-                    string userInput = Console.ReadLine();
+                    int userInput;
+                    bool isAviaryFound = int.TryParse(Console.ReadLine(), out userInput);
 
-                    switch (userInput)
+                    if(isAviaryFound && userInput > 0 && userInput - 1 < _aviaries.Count)
                     {
-                        case "1":
-                            _aviaries[0].ShowInfo();
-                            break;
-                        case "2":
-                            _aviaries[1].ShowInfo();
-                            break;
-                        case "3":
-                            _aviaries[2].ShowInfo();
-                            break;
-                        case "4":
-                            _aviaries[3].ShowInfo();
-                            break;
-                        case "5":
-                            _isWork = false;
-                            break;
-                        default:
-                            Console.WriteLine("Вы не понимаете чего хотите.");
-                            break;
+                        for (int i = 0; i < _aviaries.Count; i++)
+                        {
+                            if (userInput-1 == i)
+                            {
+                                _aviaries[i].ShowInfo();
+                            }
+                        }
+                    }
+                    else if (userInput == 5)
+                    {
+                        _isWork = false;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Такого вольера нет.");
                     }
 
                     Console.WriteLine("\nДля продолжения нажмите любую клавишу.");
                     Console.ReadKey();
                     Console.Clear();
                 }
+            }
+
+            private void CreateAviary(string nameAviary, string nameAnimal, string soundMakes)
+            {
+                _aviaries.Add(new Aviary(nameAviary));
+                _aviaries[_aviaries.Count-1].AddAnimals(nameAnimal, soundMakes);
             }
         }
 
@@ -84,35 +84,11 @@ namespace Zoo
                 _random = new Random();
             }
 
-            public void CreateMonkey()
+            public void AddAnimals(string name, string sound)
             {
-                for (int i = 0; i < _random.Next(10,20); i++)
+                for (int i = 0; i < _random.Next(10, 15); i++)
                 {
-                    _animals.Add(new Monkey());
-                }
-            }
-
-            public void CreateElephant()
-            {
-                for (int i = 0; i < _random.Next(10, 20); i++)
-                {
-                    _animals.Add(new Elephant());
-                }
-            }
-
-            public void CreateGoat()
-            {
-                for (int i = 0; i < _random.Next(10, 20); i++)
-                {
-                    _animals.Add(new Goat());
-                }
-            }
-
-            public void CreateTiger()
-            {
-                for (int i = 0; i < _random.Next(10, 20); i++)
-                {
-                    _animals.Add(new Tiger());
+                    _animals.Add(new Animal(name, sound));
                 }
             }
 
@@ -140,8 +116,10 @@ namespace Zoo
             public string SoundMakes { get; protected set; }
             public bool IsMan { get; protected set; }
 
-            public Animal()
+            public Animal(string name = "животное", string soundMakes = "звук животного")
             {
+                Name = name;
+                SoundMakes = soundMakes;
                 _random = new Random();
                 IsMan = _random.Next(0, 2) > 0;
                 System.Threading.Thread.Sleep(10);
@@ -153,42 +131,6 @@ namespace Zoo
                     Console.WriteLine("мужской.");
                 else
                     Console.WriteLine("женский.");
-            }
-        }
-
-        class Monkey : Animal
-        {
-            public Monkey(string soundMakes = "У-у", string name = "обезьяна") : base() 
-            {
-                SoundMakes = soundMakes;
-                Name = name;
-            }
-        }
-
-        class Elephant : Animal
-        {
-            public Elephant(string soundMakes = "который невозможно услышать", string name = "слон") : base() 
-            {
-                SoundMakes = soundMakes;
-                Name = name;
-            }
-        }
-
-        class Goat : Animal
-        {
-            public Goat(string soundMakes = "Ме-е-е-е", string name = "козёл") : base () 
-            {
-                SoundMakes = soundMakes;
-                Name = name;
-            }
-        }
-
-        class Tiger : Animal
-        {
-            public Tiger(string soundMakes = "Р-р-р", string name = "тигр") : base() 
-            {
-                SoundMakes = soundMakes;
-                Name = name;
             }
         }
     }
