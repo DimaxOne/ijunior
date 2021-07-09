@@ -1,0 +1,168 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Сarservice
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            CarService carService = new CarService();
+            carService.Work();
+        }
+    }
+
+    class CarService
+    {
+        private int _money;
+        private int _fine;
+        private List<SparePart> _spareParts;
+        private Queue<Car> _cars;
+        private Random _random;
+
+        public CarService()
+        {
+            _spareParts = new List<SparePart>();
+            _cars = new Queue<Car>();
+            _money = 0;
+            _fine = 1000;
+            _random = new Random();
+            CreatSparePart();
+            CreateCars();
+        }
+
+        public void Work()
+        {
+            while (_cars.Count > 0)
+            {
+                int indexSparePart;
+                string reasonBreakdown = _cars.Peek().GetReasonBreakdown(_random);
+                Console.WriteLine($"Баланс средств автосервиса {_money} рублей.\nК нам прибыл автомобиль с" +
+                    $"проблемой: {reasonBreakdown}.\nНажмите любую клавишу и мы увидим сможет ли " +
+                    $"автосервис помочь клиенту.");
+                Console.ReadKey();
+
+                bool isSparePartAvailability = CheckSparePartAvailability(reasonBreakdown, out indexSparePart);
+
+                if (isSparePartAvailability)
+                {
+                    bool isMakeMistake = MakeMistake();
+
+                    if(!isMakeMistake)
+                    {
+                        int totalCost = _spareParts[indexSparePart].Cost + _spareParts[indexSparePart].Cost * 20 / 100;
+                        Console.WriteLine($"Вы произвели замену {_spareParts[indexSparePart].Name}. Клиент заплатил {totalCost} " +
+                            $"рублей за работу и деталь.");
+                        _money += totalCost;
+                        _spareParts.RemoveAt(indexSparePart);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"По неосторожности была заменена не та деталь. Автосервис выплатил штраф " +
+                            $"в размере {_fine} рублей. Клиент ушел.");
+                        _money -= _fine;
+                        if (_spareParts.Count > 1)
+                        {
+                            _spareParts.RemoveAt(_random.Next(0, _spareParts.Count + 1));
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Нужной детали в наличии не оказалось. Автосервис выплатил штраф в размере {_fine} рублей. " +
+                        $"Клиент ушел.");
+                    _money -= _fine;
+                }
+
+                _cars.Dequeue();
+                Console.ReadKey();
+                Console.Clear();
+            }
+        }
+
+        private void CreatSparePart()
+        {
+            for (int i = 0; i < _random.Next(5,12); i++)
+            {
+                _spareParts.Add(new SparePart("Колесо", 1500));
+                _spareParts.Add(new SparePart("Дверь", 4500));
+                _spareParts.Add(new SparePart("Дворники", 450));
+                _spareParts.Add(new SparePart("Фара", 700));
+                _spareParts.Add(new SparePart("Лобовое стекло", 8000));
+                _spareParts.Add(new SparePart("Аккумулятор", 2500));
+                _spareParts.Add(new SparePart("Двигатель", 20000));
+            }
+        }
+
+        private void CreateCars()
+        {
+            for (int i = 0; i < _random.Next(30,80); i++)
+            {
+                _cars.Enqueue(new Car());
+            }
+        }
+
+        private bool CheckSparePartAvailability(string reasonBreakdown, out int index)
+        {
+            index = 0;
+            bool resultSearch = false;
+            for (int i = 0; i < _spareParts.Count; i++)
+            {
+                if (reasonBreakdown.ToLower().Contains(_spareParts[i].Name.ToLower()))
+                {
+                    index = i;
+                    resultSearch = true;
+                    break;
+                }
+            }
+
+            return resultSearch;
+        }
+
+        private bool MakeMistake()
+        {
+            if (_random.Next(0, 101) < 90)
+                return false;
+            else
+                return true;
+        }
+    }
+
+    class Car
+    {
+        private List<string> _breakdowns;
+
+        public Car()
+        {
+            _breakdowns = new List<string>();
+
+            _breakdowns.Add("пробило колесо");
+            _breakdowns.Add("замяло дверь после аварии");
+            _breakdowns.Add("отказали дворники");
+            _breakdowns.Add("разбита фара");
+            _breakdowns.Add("разбито лобовое стекло");
+            _breakdowns.Add("нужен новый аккумулятор");
+            _breakdowns.Add("нужен новый двигатель");
+        }
+
+        public string GetReasonBreakdown(Random random)
+        {
+            return _breakdowns[random.Next(0, _breakdowns.Count)];
+        }
+    }
+
+    class SparePart
+    {
+        public string Name { get; private set; }
+        public int Cost { get; private set; }
+
+        public SparePart(string name, int cost)
+        {
+            Name = name;
+            Cost = cost;
+        }
+    }
+}
