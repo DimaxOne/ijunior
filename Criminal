@@ -1,0 +1,84 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Criminal
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Database database = new Database();
+            database.GetFilteredCriminal();
+        }
+    }
+
+    class Database
+    {
+        private List<Criminal> _criminals;
+
+        public Database()
+        {
+            _criminals = new List<Criminal>();
+            _criminals.Add(new Criminal("Джон Траволта", false, 182, 94, "Россия"));
+            _criminals.Add(new Criminal("Алекс Шварцнегер", true, 189, 110, "Германия"));
+            _criminals.Add(new Criminal("Гомер Аддамс", true, 167, 52, "Россия"));
+            _criminals.Add(new Criminal("Джим Кейт", false, 177, 82, "США"));
+            _criminals.Add(new Criminal("Александр Резванов", false, 182, 94, "Россия"));
+            _criminals.Add(new Criminal("Владимир Бойко", false, 182, 94, "Украина"));
+            _criminals.Add(new Criminal("Петр Слепаков", false, 182, 59, "Беларусь"));
+            _criminals.Add(new Criminal("Владислав Гусейнов", true, 182, 94, "Россия"));
+        }
+
+        public void GetFilteredCriminal()
+        {
+            Console.Write("Вы в базе данных детективов. Введите данные предполагаемого преступника.\nРост: ");
+            int inputHeight = GetNumber();
+            Console.Write("Вес: ");
+            int inputWeight = GetNumber();
+            Console.Write("Введите национальность: ");
+            string inputNational = Console.ReadLine();
+
+            var filteredCriminals = _criminals.Where(criminal => criminal.Height == inputHeight).
+                Where(criminal => criminal.Weight == inputWeight).Where(criminal => criminal.National.ToUpper() ==
+                inputNational.ToUpper()).Where(criminal => criminal.IsArrest != true).ToList();
+
+            foreach (var criminal in filteredCriminals)
+            {
+               Console.WriteLine(criminal.Name);
+            }
+
+            if (filteredCriminals.Count == 0)
+                Console.WriteLine("Ваш запрос не дал результата.");
+        }
+
+        private int GetNumber()
+        {
+            bool isNumber = false;
+            int number = 0;
+            while (!isNumber)
+                isNumber = int.TryParse(Console.ReadLine(), out number);
+            return number;
+        }
+    }
+
+    class Criminal
+    {
+        public string Name { get; private set; }
+        public bool IsArrest { get; private set; }
+        public int Height { get; private set; }
+        public int Weight { get; private set; }
+        public string National { get; private set; }
+
+        public Criminal(string name, bool isArrest, int height, int weight, string national)
+        {
+            Name = name;
+            IsArrest = isArrest;
+            Height = height;
+            Weight = weight;
+            National = national;
+        }
+    }
+}
