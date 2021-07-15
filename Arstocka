@@ -1,0 +1,66 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Arstocka
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Arstocka arstocka = new Arstocka();
+            arstocka.ShowCriminals();
+            arstocka.DoAmnesty();
+            arstocka.ShowCriminals();
+        }
+    }
+
+    class Arstocka
+    {
+        private List<Criminal> _criminals;
+
+        public Arstocka()
+        {
+            _criminals = new List<Criminal>();
+            _criminals.Add(new Criminal("Бен Хопкинс", "Убийство"));
+            _criminals.Add(new Criminal("Алекс Афлек", "Убийство"));
+            _criminals.Add(new Criminal("Энтони Симпсон", "Угон"));
+            _criminals.Add(new Criminal("Бенджамин Тайсон", "Антиправительственное"));
+            _criminals.Add(new Criminal("Энтони Харди", "Воровство"));
+            _criminals.Add(new Criminal("Том Бэкинсейл", "Наркоторговля"));
+            _criminals.Add(new Criminal("Барт Андерсон", "Антиправительственное"));
+            _criminals.Add(new Criminal("Луи Майерс", "Воровство"));
+        }   
+
+        public void DoAmnesty()
+        {
+            Console.WriteLine("\nВ Арстоцке произошла амнистия!");
+            var filteredCriminals = _criminals.Where(criminal => criminal.Crime != "Антиправительственное").ToList();
+
+            _criminals = filteredCriminals;
+        }
+
+        public void ShowCriminals()
+        {
+            Console.WriteLine("Список всех преступников в Арстоцке:");
+            foreach (var criminal in _criminals)
+            {
+                Console.WriteLine(criminal.Name);
+            }
+        }
+    }
+
+    class Criminal
+    {
+        public string Name { get; private set; }
+        public string Crime { get; private set; }
+
+        public Criminal(string name, string crime)
+        {
+            Name = name;
+            Crime = crime;
+        }
+    }
+}
