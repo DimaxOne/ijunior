@@ -1,0 +1,129 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Hospital
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Hospital hospital = new Hospital();
+            hospital.Work();
+        }
+    }
+
+    class Hospital
+    {
+        private List<Patient> _patients;
+        private bool _isWork;
+
+        public Hospital()
+        {
+            _patients = new List<Patient>();
+            _isWork = true;
+            _patients.Add(new Patient("Энтони Четкий", 21, "Облысение"));
+            _patients.Add(new Patient("Джордж Симс", 64, "Шизофрения"));
+            _patients.Add(new Patient("Стефан Подлый", 34, "Диарея"));
+            _patients.Add(new Patient("Роберт Хопкинс", 56, "Паркенсон"));
+            _patients.Add(new Patient("Энтони Пьеро", 19, "Хроническая усталость"));
+            _patients.Add(new Patient("Том Вэйн", 25, "Алкоголизм"));
+            _patients.Add(new Patient("Двейн Поважный", 36, "Наркомания"));
+            _patients.Add(new Patient("Бенджамин Батхен", 82, "Омолодение"));
+            _patients.Add(new Patient("Адэлин Вотсон", 38, "Обморожение"));
+            _patients.Add(new Patient("Спаун Обозленный", 40, "Диагноз ещё не установлен"));
+        }
+
+        public void Work()
+        {
+            while(_isWork)
+            {
+                Console.WriteLine("Вам доступны следующие действия:\n1. Отсортировать всех больных по ФИО;\n2. Отсортировать" +
+                "всех больных по возрасту;\n3. Вывести всех больных с определенным заболеванием;\n4. Выйти из программы.");
+
+                string userInput = Console.ReadLine();
+
+                switch (userInput)
+                {
+                    case "1":
+                        Console.WriteLine("Пациенты, отсортированные по ФИО:\n");
+                        SortPatientByName();
+                        break;
+                    case "2":
+                        Console.WriteLine("Пациенты, отсортированные по возрасту:\n");
+                        SortPatientByAge();
+                        break;
+                    case "3":
+                        Console.WriteLine("Введите заболевание: ");
+                        SearchPatientByIllness();
+                        break;
+                    case "4":
+                        _isWork = false;
+                        break;
+                    default:
+                        Console.WriteLine("Вы ввели недоступную команду.");
+                        break;
+                }
+
+                Console.ReadKey();
+                Console.Clear();
+            }
+        }
+
+        private void SortPatientByName()
+        {
+            var patientNameSorted = _patients.OrderBy(patient => patient.Name);
+
+            foreach (var patient in patientNameSorted)
+            {
+                patient.ShowInfo();
+            }
+        }
+
+        private void SortPatientByAge()
+        {
+            var patientAgeSorted = _patients.OrderBy(patient => patient.Age);
+
+            foreach (var patient in patientAgeSorted)
+            {
+                patient.ShowInfo();
+            }
+        }
+        private void SearchPatientByIllness()
+        {
+            string inputIllness = Console.ReadLine();
+            var patientIllnessSorted = _patients.Where(patient => patient.Illness == inputIllness).ToList();
+
+            foreach (var patient in patientIllnessSorted)
+            {
+                patient.ShowInfo();
+            }
+
+            if (patientIllnessSorted.Count == 0)
+            {
+                Console.WriteLine("Пациентов с таким диагнозом нет.");
+            }
+        }
+    }
+
+    class Patient 
+    {
+        public string Name { get; private set; }
+        public int Age { get; private set; }
+        public string Illness { get; private set; }
+
+        public Patient(string name, int age, string illness)
+        {
+            Name = name;
+            Age = age;
+            Illness = illness;
+        }
+
+        public void ShowInfo()
+        {
+            Console.WriteLine($"{Name}, возраст {Age}, болезнь - {Illness}.");
+        }
+    }
+}
