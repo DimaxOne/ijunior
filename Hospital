@@ -48,11 +48,11 @@ namespace Hospital
                 switch (userInput)
                 {
                     case "1":
-                        Console.WriteLine("Пациенты, отсортированные по ФИО:\n");
+                        Console.WriteLine("\nПациенты, отсортированные по ФИО:");
                         SortPatientByName();
                         break;
                     case "2":
-                        Console.WriteLine("Пациенты, отсортированные по возрасту:\n");
+                        Console.WriteLine("\nПациенты, отсортированные по возрасту:");
                         SortPatientByAge();
                         break;
                     case "3":
@@ -74,36 +74,35 @@ namespace Hospital
 
         private void SortPatientByName()
         {
-            var patientNameSorted = _patients.OrderBy(patient => patient.Name);
-
-            foreach (var patient in patientNameSorted)
-            {
-                patient.ShowInfo();
-            }
+            var patientNameSorted = _patients.OrderBy(patient => patient.Name).ToList();
+            _patients = patientNameSorted;
+            ShowAllPatients(_patients);
         }
 
         private void SortPatientByAge()
         {
-            var patientAgeSorted = _patients.OrderBy(patient => patient.Age);
-
-            foreach (var patient in patientAgeSorted)
-            {
-                patient.ShowInfo();
-            }
+            var patientAgeSorted = _patients.OrderBy(patient => patient.Age).ToList();
+            _patients = patientAgeSorted;
+            ShowAllPatients(_patients);
         }
+
         private void SearchPatientByIllness()
         {
             string inputIllness = Console.ReadLine();
             var patientIllnessSorted = _patients.Where(patient => patient.Illness == inputIllness).ToList();
-
-            foreach (var patient in patientIllnessSorted)
-            {
-                patient.ShowInfo();
-            }
+            ShowAllPatients(patientIllnessSorted);
 
             if (patientIllnessSorted.Count == 0)
             {
                 Console.WriteLine("Пациентов с таким диагнозом нет.");
+            }
+        }
+
+        private void ShowAllPatients(List<Patient> patients)
+        {
+            foreach (var patient in patients)
+            {
+                patient.ShowInfo();
             }
         }
     }
@@ -120,7 +119,7 @@ namespace Hospital
             Age = age;
             Illness = illness;
         }
-
+        
         public void ShowInfo()
         {
             Console.WriteLine($"{Name}, возраст {Age}, болезнь - {Illness}.");
