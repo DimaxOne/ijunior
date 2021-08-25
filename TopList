@@ -37,23 +37,23 @@ namespace TopList
 
         public void ShowTopThreeLevel()
         {
-            var filteredPlayersByLevel = _players.OrderByDescending(player => player.Level).ToArray();
+            var filteredPlayersByLevel = _players.OrderByDescending(player => player.Level).Take(3).ToArray();
             Console.WriteLine("\nТоп 3 персонажей по уровню:");
 
-            for (int i = 0; i <= 2; i++)
+            foreach (var player in filteredPlayersByLevel)
             {
-                Console.WriteLine(filteredPlayersByLevel[i].Name);
+                Console.WriteLine(player.Name);
             }
         }
 
         public void ShowTopThreeStrength()
         {
-            var filteredPlayersByStrength = _players.OrderByDescending(player => player.Strength).ToArray();
+            var filteredPlayersByStrength = _players.OrderByDescending(player => player.Strength).Take(3).ToArray();
             Console.WriteLine("\nТоп 3 персонажей по силе:");
 
-            for (int i = 0; i <= 2; i++)
+            foreach (var player in filteredPlayersByStrength)
             {
-                Console.WriteLine(filteredPlayersByStrength[i].Name);
+                Console.WriteLine(player.Name);
             }
         }
     }
