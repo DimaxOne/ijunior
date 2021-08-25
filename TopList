@@ -1,0 +1,74 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace TopList
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Game game = new Game();
+            game.ShowTopThreeLevel();
+            game.ShowTopThreeStrength();
+        }
+    }
+
+    class Game
+    {
+        private List<Player> _players;
+
+        public Game()
+        {
+            _players = new List<Player>();
+            _players.Add(new Player("Glad", 70, 120));
+            _players.Add(new Player("TopChar", 78, 115));
+            _players.Add(new Player("Smurf", 75, 134));
+            _players.Add(new Player("Chupakabra", 50, 97));
+            _players.Add(new Player("Galaktika", 67, 99));
+            _players.Add(new Player("Taktic", 79, 124));
+            _players.Add(new Player("Jora", 80, 145));
+            _players.Add(new Player("Morj", 69, 98));
+            _players.Add(new Player("Karamelka", 51, 61));
+            _players.Add(new Player("Zeus", 74, 111));
+        }
+
+        public void ShowTopThreeLevel()
+        {
+            var filteredPlayersByLevel = _players.OrderByDescending(player => player.Level).ToArray();
+            Console.WriteLine("\nТоп 3 персонажей по уровню:");
+
+            for (int i = 0; i <= 2; i++)
+            {
+                Console.WriteLine(filteredPlayersByLevel[i].Name);
+            }
+        }
+
+        public void ShowTopThreeStrength()
+        {
+            var filteredPlayersByStrength = _players.OrderByDescending(player => player.Strength).ToArray();
+            Console.WriteLine("\nТоп 3 персонажей по силе:");
+
+            for (int i = 0; i <= 2; i++)
+            {
+                Console.WriteLine(filteredPlayersByStrength[i].Name);
+            }
+        }
+    }
+
+    class Player
+    {
+        public string Name { get; private set; }
+        public int Level { get; private set; }
+        public int Strength { get; private set; }
+
+        public Player(string name, int level, int strength)
+        {
+            Name = name;
+            Level = level;
+            Strength = strength;
+        }
+    }
+}
