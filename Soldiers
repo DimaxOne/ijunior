@@ -1,0 +1,63 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Soldiers
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Battalion battalion = new Battalion();
+            battalion.ShowNameRankSoldiers();
+        }
+    }
+
+    class Battalion
+    {
+        private List<Soldier> _soldiers;
+
+        public Battalion()
+        {
+            _soldiers = new List<Soldier>();
+
+            _soldiers.Add(new Soldier("Noah", "M-16", "рядовой", 8));
+            _soldiers.Add(new Soldier("Liam", "M-16", "рядовой", 6));
+            _soldiers.Add(new Soldier("Mason", "M-16", "рядовой", 9));
+            _soldiers.Add(new Soldier("Jacob", "M-16", "рядовой", 12));
+            _soldiers.Add(new Soldier("William", "MR-C", "сержант", 24));
+            _soldiers.Add(new Soldier("Ethan", "SR-47", "офицер", 43));
+            _soldiers.Add(new Soldier("Michael", "Robinson Armaments XCR", "полковник", 98));
+            _soldiers.Add(new Soldier("Alexander", "CAR-15", "генерал", 124));
+        }
+
+        public void ShowNameRankSoldiers()
+        {
+            var soldierNameAndRank = _soldiers.Select(soldier => $"Имя: {soldier.Name}, звание: {soldier.Rank}.").ToList();
+
+            foreach (var soldier in soldierNameAndRank)
+            {
+                Console.WriteLine(soldier);
+            }
+        }
+    }
+
+    class Soldier
+    {
+        private string _weaponry;
+        private int _employMonth;
+
+        public string Name { get; private set; }
+        public string Rank { get; private set; }
+        
+        public Soldier(string name, string weaponry, string rank, int employMonth)
+        {
+            _weaponry = weaponry;
+            _employMonth = employMonth;
+            Name = name;
+            Rank = rank;
+        }
+    }
+}
