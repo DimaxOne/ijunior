@@ -1,0 +1,78 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Stews
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Warehouse warehouse = new Warehouse();
+            warehouse.ShowStew();
+            warehouse.ShowExpiredStew();
+        }
+    }
+
+    class Warehouse
+    {
+        private List<Stew> _stews;
+        private Random _random;
+
+        public Warehouse()
+        {
+            _stews = new List<Stew>();
+            _random = new Random();
+
+            for (int i = 0; i < _random.Next(30,50); i++)
+            {
+                _stews.Add(new Stew(("Говядина тушеная"), 2020 - i, 4));
+                _stews.Add(new Stew(("Свинина тушеная"), 2020 - i, 4));
+                _stews.Add(new Stew(("Тушенка"), 2021 - i, 3));
+            }
+        }
+
+        public void ShowStew()
+        {
+            Console.WriteLine("Список всей тушенки:\n");
+            
+            foreach (var stew in _stews)
+            {
+                stew.ShowInfo();
+            }
+        }
+
+        public void ShowExpiredStew()
+        {
+            var expiredStew = _stews.Where(stew => (stew.ProductionDate + stew.ExpirationDate) < DateTime.Today.Year).
+                OrderBy(stew => stew.Name).ToList();
+            Console.WriteLine("\nТушенка с истекшим сроком годности:\n");
+
+            foreach (var stew in expiredStew)
+            {
+                stew.ShowInfo();
+            }
+        }
+    }
+
+    class Stew
+    {
+        public string Name { get; private set; }
+        public int ProductionDate { get; private set; }
+        public int ExpirationDate { get; private set; }
+
+        public Stew(string name, int productionDate, int expirationDate)
+        {
+            Name = name;
+            ProductionDate = productionDate;
+            ExpirationDate = expirationDate;
+        }
+
+        public void ShowInfo()
+        {
+            Console.WriteLine($"Название - {Name}, дата производства - {ProductionDate}, срок годности - {ExpirationDate}.");
+        }
+    }
+}
