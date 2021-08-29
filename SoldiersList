@@ -1,0 +1,75 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace SoldiersLIst
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Squad squad = new Squad();
+            squad.ShowAllInfo();
+            squad.RegroupSoldiers();
+            squad.ShowAllInfo();
+        }
+    }
+
+    class Squad
+    {
+        private List<Soldier> _first;
+        private List<Soldier> _second;
+
+        public Squad()
+        {
+            _first = new List<Soldier>();
+            _second = new List<Soldier>();
+
+            _first.Add(new Soldier("Аранский Павел"));
+            _first.Add(new Soldier("Борисов Евгений"));
+            _first.Add(new Soldier("Петров Андрей"));
+            _first.Add(new Soldier("Дроздов Сергей"));
+            _second.Add(new Soldier("Камалов Владимир"));
+            _second.Add(new Soldier("Смирнов Иван"));
+            _second.Add(new Soldier("Игнатьев Георгий"));
+            _second.Add(new Soldier("Дерюжин Александр"));
+        }
+
+        public void RegroupSoldiers()
+        {
+            var foundFilteredSoldiers = _first.Where(soldier => soldier.Name.StartsWith("Д")).ToList();
+            _second = _second.Union(foundFilteredSoldiers).ToList();
+            _first = _first.OrderByDescending(soldier => soldier.Name.StartsWith("Д")).SkipWhile(soldier => soldier.Name.StartsWith("Д")).ToList();
+
+            Console.WriteLine("\nОтряды перегруппированы!\n");
+        }
+
+        public void ShowAllInfo()
+        {
+            Console.WriteLine("Первый отряд:");
+            ShowInfo(_first);
+            Console.WriteLine("\nВторой отряд:");
+            ShowInfo(_second);
+        }
+
+        private void ShowInfo(List<Soldier> soldiers)
+        {
+            foreach (var soldier in soldiers)
+            {
+                Console.WriteLine(soldier.Name);
+            }
+        }
+    }
+
+    class Soldier
+    {
+        public string Name { get; private set; }
+
+        public Soldier(string name)
+        {
+            Name = name;
+        }
+    }
+}
