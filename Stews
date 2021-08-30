@@ -25,8 +25,9 @@ namespace Stews
         {
             _stews = new List<Stew>();
             _random = new Random();
+            int countStews = _random.Next(30, 50);
 
-            for (int i = 0; i < _random.Next(30,50); i++)
+            for (int i = 0; i < countStews; i++)
             {
                 _stews.Add(new Stew(("Говядина тушеная"), 2020 - i, 4));
                 _stews.Add(new Stew(("Свинина тушеная"), 2020 - i, 4));
@@ -46,11 +47,11 @@ namespace Stews
 
         public void ShowExpiredStew()
         {
-            var expiredStew = _stews.Where(stew => (stew.ProductionDate + stew.ExpirationDate) < DateTime.Today.Year).
+            var expiredStews = _stews.Where(stew => (stew.ProductionDate + stew.ExpirationDate) < DateTime.Today.Year).
                 OrderBy(stew => stew.Name).ToList();
             Console.WriteLine("\nТушенка с истекшим сроком годности:\n");
 
-            foreach (var stew in expiredStew)
+            foreach (var stew in expiredStews)
             {
                 stew.ShowInfo();
             }
