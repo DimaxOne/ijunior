@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoldiersLIst
+namespace SoldiersList
 {
     class Program
     {
@@ -41,7 +41,7 @@ namespace SoldiersLIst
         {
             var foundFilteredSoldiers = _first.Where(soldier => soldier.Name.StartsWith("Д")).ToList();
             _second = _second.Union(foundFilteredSoldiers).ToList();
-            _first = _first.OrderByDescending(soldier => soldier.Name.StartsWith("Д")).SkipWhile(soldier => soldier.Name.StartsWith("Д")).ToList();
+            _first = _first.Except(foundFilteredSoldiers).ToList();
 
             Console.WriteLine("\nОтряды перегруппированы!\n");
         }
